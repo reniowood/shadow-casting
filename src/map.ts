@@ -29,7 +29,9 @@ export default class Map {
   }
 
   toggle(y: number, x: number) {
-    this.map[y][x].filled = !this.map[y][x].filled;
+    const Y = Math.floor(y);
+    const X = Math.floor(x);
+    this.map[Y][X].filled = !this.map[Y][X].filled;
   }
 
   updateEdges() {

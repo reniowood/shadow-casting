@@ -8,14 +8,9 @@ export default class Canvas {
 
   constructor(size: number, map: Map) {
     this.size = size;
-    this.element = this.createCanvasElement(size);
-    document.getElementById('main').appendChild(this.element);
-    this.element.onclick = (event) => {
-      console.log(`clicked: (${event.offsetX}, ${event.offsetY})`);
-      map.toggle(Math.floor(event.offsetY / 16), Math.floor(event.offsetX / 16));
-      map.updateEdges();
-    };
     this.map = map;
+    this.element = this.createCanvasElement(size);
+    this.addOnClickHandler();
     this.scale = this.size / map.size;
   }
 
@@ -26,7 +21,16 @@ export default class Canvas {
     canvas.height = size;
     canvas.setAttribute('style', 'border: 1px solid;');
 
+    document.getElementById('main').appendChild(canvas);
+
     return canvas;
+  }
+
+  private addOnClickHandler() {
+    this.element.onclick = (event) => {
+      this.map.toggle(event.offsetY / this.scale, event.offsetX / this.scale);
+      this.map.updateEdges();
+    };
   }
 
   draw() {
