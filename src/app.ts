@@ -1,4 +1,7 @@
-class App {
+import Map from './map';
+import Canvas from './canvas';
+
+export default class App {
   private readonly map: Map;
   private readonly canvas: Canvas;
   private readonly fps: number;

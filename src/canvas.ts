@@ -1,5 +1,6 @@
+import Map from './map';
 
-class Canvas {
+export default class Canvas {
   private readonly element: HTMLCanvasElement;
   readonly width: number;
   readonly height: number;
@@ -24,11 +25,11 @@ class Canvas {
 
   private createCanvasElement(width: number, height: number): HTMLCanvasElement {
     const canvas: HTMLCanvasElement = document.createElement('canvas');
-  
+
     canvas.width = width;
     canvas.height = height;
     canvas.setAttribute('style', 'border: 1px solid;');
-  
+
     return canvas;
   }
 
