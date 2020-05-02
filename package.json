@@ -4,12 +4,14 @@
   "description": "",
   "private": true,
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "start:dev": "webpack-dev-server"
   },
   "devDependencies": {
     "ts-loader": "^7.0.2",
     "typescript": "^3.8.3",
     "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11"
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
   }
 }
