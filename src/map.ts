@@ -124,7 +124,7 @@ export default class Map {
       const row: Cell[] = [];
 
       for (let j = 0; j < size; j += 1) {
-        row.push({ filled: false });
+        row.push({ filled: i === 0 || j === 0 || i === size - 1 || j === size - 1 });
       }
 
       map.push(row);
