@@ -1,16 +1,13 @@
+import { Line, Point } from './common';
+
+type Edge = Line;
+
 interface Cell {
   filled: boolean;
   up?: Edge;
   down?: Edge;
   left?: Edge;
   right?: Edge;
-}
-
-interface Edge {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
 }
 
 export default class Map {
@@ -53,19 +50,25 @@ export default class Map {
     }
   }
 
+  get points(): Point[] {
+    const points: Point[] = [];
+
+    for (const edge of this.edges) {
+      points.push(edge.from);
+      points.push(edge.to);
+    }
+
+    return points;
+  }
+
   private checkTopCell(y: number, x: number) {
     if (y - 1 >= 0 && !this.map[y - 1][x].filled) {
       if (x - 1 >= 0 && this.map[y][x - 1].up) {
         const edge = this.map[y][x - 1].up;
-        edge.x2 += 1;
+        edge.to.x += 1;
         this.map[y][x].up = edge;
       } else {
-        const edge: Edge = {
-          x1: x,
-          y1: y,
-          x2: x + 1,
-          y2: y
-        };
+        const edge = new Line(new Point(x, y), new Point(x + 1, y));
         this.map[y][x].up = edge;
         this.edges.push(edge);
       }
@@ -76,15 +79,10 @@ export default class Map {
     if (y + 1 < this.size && !this.map[y + 1][x].filled) {
       if (x - 1 >= 0 && this.map[y][x - 1].down) {
         const edge = this.map[y][x - 1].down;
-        edge.x2 += 1;
+        edge.to.x += 1;
         this.map[y][x].down = edge;
       } else {
-        const edge: Edge = {
-          x1: x,
-          y1: y + 1,
-          x2: x + 1,
-          y2: y + 1
-        };
+        const edge: Edge = new Line(new Point(x, y + 1), new Point(x + 1, y + 1));
         this.map[y][x].down = edge;
         this.edges.push(edge);
       }
@@ -95,15 +93,10 @@ export default class Map {
     if (x - 1 >= 0 && !this.map[y][x - 1].filled) {
       if (y - 1 >= 0 && this.map[y - 1][x].left) {
         const edge = this.map[y - 1][x].left;
-        edge.y2 += 1;
+        edge.to.y += 1;
         this.map[y][x].left = edge;
       } else {
-        const edge: Edge = {
-          x1: x,
-          y1: y,
-          x2: x,
-          y2: y + 1
-        };
+        const edge: Edge = new Line(new Point(x, y), new Point(x, y + 1));
         this.map[y][x].left = edge;
         this.edges.push(edge);
       }
@@ -114,15 +107,10 @@ export default class Map {
     if (x + 1 < this.size && !this.map[y][x + 1].filled) {
       if (y - 1 >= 0 && this.map[y - 1][x].right) {
         const edge = this.map[y - 1][x].right;
-        edge.y2 += 1;
+        edge.to.y += 1;
         this.map[y][x].right = edge;
       } else {
-        const edge: Edge = {
-          x1: x + 1,
-          y1: y,
-          x2: x + 1,
-          y2: y + 1
-        };
+        const edge: Edge = new Line(new Point(x + 1, y), new Point(x + 1, y + 1));
         this.map[y][x].right = edge;
         this.edges.push(edge);
       }

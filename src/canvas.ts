@@ -1,16 +1,20 @@
 import Map from './map';
+import { Line, Point } from './common';
 
 export default class Canvas {
   private readonly element: HTMLCanvasElement;
   readonly size: number;
   private readonly map: Map;
   private readonly scale: number;
+  private cursorPosition?: Point;
 
   constructor(size: number, map: Map) {
     this.size = size;
     this.map = map;
     this.element = this.createCanvasElement(size);
     this.addOnClickHandler();
+    this.addOnMouseOverHandler();
+    this.addOnMouseOutHandler();
     this.scale = this.size / map.size;
   }
 
@@ -33,10 +37,23 @@ export default class Canvas {
     };
   }
 
+  private addOnMouseOverHandler() {
+    this.element.onmousemove = (event) => {
+      this.cursorPosition = new Point(event.offsetX / this.scale, event.offsetY / this.scale);
+    };
+  }
+
+  private addOnMouseOutHandler() {
+    this.element.onmouseout = (event) => {
+      this.cursorPosition = undefined;
+    };
+  }
+
   draw() {
     this.clearCanvas();
     this.drawCell();
     this.drawEdges();
+    this.drawCastingLines();
   }
 
   private clearCanvas() {
@@ -61,33 +78,50 @@ export default class Canvas {
   private drawEdges() {
     this.map.edges.forEach((edge) => {
       const radius = this.scale / 4;
-      const x1 = edge.x1 * this.scale;
-      const y1 = edge.y1 * this.scale;
-      const x2 = edge.x2 * this.scale;
-      const y2 = edge.y2 * this.scale;
 
-      this.drawPoint(x1, y1, radius);
-      this.drawLine(x1, y1, x2, y2);
-      this.drawPoint(x2, y2, radius);
+      this.drawPoint(edge.from, radius);
+      this.drawLine(edge);
+      this.drawPoint(edge.to, radius);
     });
   }
 
-  private drawPoint(x: number, y: number, r: number) {
+  private drawCastingLines() {
+    if (this.cursorPosition) {
+      for (let point of this.map.points) {
+        const castingLine = new Line(this.cursorPosition, point);
+        if (!this.isLineCrossCell(castingLine)) {
+          this.drawLine(castingLine);
+        }
+      }
+    }
+  }
+
+  private isLineCrossCell(line: Line) {
+    for (let edge of this.map.edges) {
+      if (!edge.hasPoint(line.from) && !edge.hasPoint(line.to) && edge.intersect(line)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private drawPoint(p: Point, r: number) {
     const context = this.element.getContext('2d');
 
     context.beginPath();
-    context.arc(x, y, r, 0, 2 * Math.PI);
+    context.arc(p.x * this.scale, p.y * this.scale, r, 0, 2 * Math.PI);
     context.fillStyle = "#ff0000";
     context.fill();
     context.stroke();
   }
 
-  private drawLine(x1: number, y1: number, x2: number, y2: number) {
+  private drawLine(line: Line) {
     const context = this.element.getContext('2d');
 
     context.beginPath();
-    context.moveTo(x1, y1);
-    context.lineTo(x2, y2);
+    context.moveTo(line.from.x * this.scale, line.from.y * this.scale);
+    context.lineTo(line.to.x * this.scale, line.to.y * this.scale);
     context.stroke();
   }
 }
