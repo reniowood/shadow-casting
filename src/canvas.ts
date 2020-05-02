@@ -2,15 +2,13 @@ import Map from './map';
 
 export default class Canvas {
   private readonly element: HTMLCanvasElement;
-  readonly width: number;
-  readonly height: number;
+  readonly size: number;
   private readonly map: Map;
-  private readonly scale: { x: number, y: number };
+  private readonly scale: number;
 
-  constructor(width: number, height: number, map: Map) {
-    this.width = width;
-    this.height = height;
-    this.element = this.createCanvasElement(width, height);
+  constructor(size: number, map: Map) {
+    this.size = size;
+    this.element = this.createCanvasElement(size);
     document.getElementById('main').appendChild(this.element);
     this.element.onclick = (event) => {
       console.log(`clicked: (${event.offsetX}, ${event.offsetY})`);
@@ -18,17 +16,14 @@ export default class Canvas {
       map.updateEdges();
     };
     this.map = map;
-    this.scale = {
-      x: this.width / map.width,
-      y: this.height / map.height,
-    };
+    this.scale = this.size / map.size;
   }
 
-  private createCanvasElement(width: number, height: number): HTMLCanvasElement {
+  private createCanvasElement(size: number): HTMLCanvasElement {
     const canvas: HTMLCanvasElement = document.createElement('canvas');
 
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = size;
+    canvas.height = size;
     canvas.setAttribute('style', 'border: 1px solid;');
 
     return canvas;
@@ -43,17 +38,17 @@ export default class Canvas {
   private clearCanvas() {
     const context = this.element.getContext('2d');
 
-    context.clearRect(0, 0, this.width, this.height);
+    context.clearRect(0, 0, this.size, this.size);
   }
 
   private drawCell() {
     const context = this.element.getContext('2d');
 
-    for (let i = 0; i < this.height; i += this.scale.y) {
-      for (let j = 0; j < this.width; j += this.scale.x) {
-        if (this.map.isFilled(Math.floor(i / this.scale.x), Math.floor(j / this.scale.y))) {
+    for (let i = 0; i < this.size; i += this.scale) {
+      for (let j = 0; j < this.size; j += this.scale) {
+        if (this.map.isFilled(Math.floor(i / this.scale), Math.floor(j / this.scale))) {
           context.fillStyle = "#0000ff";
-          context.fillRect(j, i, this.scale.x, this.scale.y);
+          context.fillRect(j, i, this.scale, this.scale);
         }
       }
     }
@@ -61,11 +56,11 @@ export default class Canvas {
 
   private drawEdges() {
     this.map.edges.forEach((edge) => {
-      const radius = Math.min(this.scale.x, this.scale.y) / 4;
-      const x1 = edge.x1 * this.scale.x;
-      const y1 = edge.y1 * this.scale.y;
-      const x2 = edge.x2 * this.scale.x;
-      const y2 = edge.y2 * this.scale.y;
+      const radius = this.scale / 4;
+      const x1 = edge.x1 * this.scale;
+      const y1 = edge.y1 * this.scale;
+      const x2 = edge.x2 * this.scale;
+      const y2 = edge.y2 * this.scale;
 
       this.drawPoint(x1, y1, radius);
       this.drawLine(x1, y1, x2, y2);

@@ -16,13 +16,11 @@ interface Edge {
 export default class Map {
   private readonly map: Cell[][];
   edges: Edge[];
-  readonly width: number;
-  readonly height: number;
+  readonly size: number;
 
-  constructor(width: number, height: number) {
-    this.width = width;
-    this.height = height;
-    this.map = this.createMap(width, height);
+  constructor(size: number) {
+    this.size = size;
+    this.map = this.createMap(size);
     this.edges = [];
   }
 
@@ -37,8 +35,8 @@ export default class Map {
   updateEdges() {
     this.edges = [];
 
-    for (let y = 0; y < this.height; y += 1) {
-      for (let x = 0; x < this.width; x += 1) {
+    for (let y = 0; y < this.size; y += 1) {
+      for (let x = 0; x < this.size; x += 1) {
         this.map[y][x] = {
           filled: this.map[y][x].filled,
         };
@@ -73,7 +71,7 @@ export default class Map {
   }
 
   private checkBottomCell(y: number, x: number) {
-    if (y + 1 < this.height && !this.map[y + 1][x].filled) {
+    if (y + 1 < this.size && !this.map[y + 1][x].filled) {
       if (x - 1 >= 0 && this.map[y][x - 1].down) {
         const edge = this.map[y][x - 1].down;
         edge.x2 += 1;
@@ -111,7 +109,7 @@ export default class Map {
   }
 
   private checkRightCell(y: number, x: number) {
-    if (x + 1 < this.width && !this.map[y][x + 1].filled) {
+    if (x + 1 < this.size && !this.map[y][x + 1].filled) {
       if (y - 1 >= 0 && this.map[y - 1][x].right) {
         const edge = this.map[y - 1][x].right;
         edge.y2 += 1;
@@ -129,13 +127,13 @@ export default class Map {
     }
   }
 
-  private createMap(width: number, height: number): Cell[][] {
+  private createMap(size: number): Cell[][] {
     const map: Cell[][] = [];
 
-    for (let i = 0; i < height; i += 1) {
+    for (let i = 0; i < size; i += 1) {
       const row: Cell[] = [];
 
-      for (let j = 0; j < width; j += 1) {
+      for (let j = 0; j < size; j += 1) {
         row.push({ filled: false });
       }
 

@@ -6,9 +6,9 @@ export default class App {
   private readonly canvas: Canvas;
   private readonly fps: number;
 
-  constructor(width: number, height: number, scale: number, fps: number) {
-    this.map = new Map(width / scale, height / scale);
-    this.canvas = new Canvas(width, height, this.map);
+  constructor(size: number, scale: number, fps: number) {
+    this.map = new Map(size / scale);
+    this.canvas = new Canvas(size, this.map);
     this.fps = fps;
   }
 
