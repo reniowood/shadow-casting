@@ -52,13 +52,14 @@ export default class Canvas {
     this.clearCanvas();
     this.drawCell();
     this.drawEdges();
-    this.drawCastingLines();
+    this.drawCastingShadow();
   }
 
   private clearCanvas() {
     const context = this.element.getContext('2d');
 
-    context.clearRect(0, 0, this.size, this.size);
+    context.fillStyle = 'black';
+    context.fillRect(0, 0, this.size, this.size);
   }
 
   private drawCell() {
@@ -92,6 +93,12 @@ export default class Canvas {
     }
   }
 
+  private drawCastingShadow() {
+    if (this.cursorPosition) {
+      this.drawShape(this.map.getCastingShadow(this.cursorPosition));
+    }
+  }
+
   private drawPoint(p: Point, r: number) {
     const context = this.element.getContext('2d');
 
@@ -109,5 +116,21 @@ export default class Canvas {
     context.moveTo(line.from.x * this.scale, line.from.y * this.scale);
     context.lineTo(line.to.x * this.scale, line.to.y * this.scale);
     context.stroke();
+  }
+
+  private drawShape(points: Point[]) {
+    const context = this.element.getContext('2d');
+
+    if (points.length > 0) {
+      context.beginPath();
+      const count = points.length;
+      context.moveTo(points[0].x * this.scale, points[0].y * this.scale);
+      for (let i = 1; i <= count; i += 1) {
+        context.lineTo(points[i % count].x * this.scale, points[i % count].y * this.scale);
+      }
+      context.closePath();
+      context.fillStyle = "white";
+      context.fill();
+    }
   }
 }

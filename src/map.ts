@@ -64,6 +64,19 @@ export default class Map {
     }
   }
 
+  getCastingShadow(p: Point): Point[] {
+    const castingPoints = [];
+    for (let point of this.points) {
+      if (!this.isLineCrossCell(new Line(p, point))) {
+        castingPoints.push(point);
+      }
+    }
+    castingPoints.sort((p1, p2) => {
+      return p.getDegreeBetween(p1) - p.getDegreeBetween(p2);
+    });
+    return castingPoints;
+  }
+
   getCastingLines(p: Point) {
     const castingLines: Line[] = [];
     for (let point of this.points) {

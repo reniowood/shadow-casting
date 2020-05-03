@@ -81,4 +81,13 @@ export class Point {
   equals(p: Point) {
     return this.x === p.x && this.y === p.y;
   }
+
+  getDistance(p: Point): number {
+    return Math.sqrt(Math.pow(this.x - p.x, 2) + Math.pow(this.y - p.y, 2));
+  }
+
+  getDegreeBetween(p: Point): number {
+    const degree = Math.acos((p.x - this.x) / this.getDistance(p));
+    return p.y < this.y ? 2 * Math.PI - degree : degree;
+  }
 }
