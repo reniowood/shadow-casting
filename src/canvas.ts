@@ -33,7 +33,6 @@ export default class Canvas {
   private addOnClickHandler() {
     this.element.onclick = (event) => {
       this.map.toggle(event.offsetY / this.scale, event.offsetX / this.scale);
-      this.map.updateEdges();
     };
   }
 
@@ -87,23 +86,10 @@ export default class Canvas {
 
   private drawCastingLines() {
     if (this.cursorPosition) {
-      for (let point of this.map.points) {
-        const castingLine = new Line(this.cursorPosition, point);
-        if (!this.isLineCrossCell(castingLine)) {
-          this.drawLine(castingLine);
-        }
+      for (let castingLine of this.map.getCastingLines(this.cursorPosition)) {
+        this.drawLine(castingLine);
       }
     }
-  }
-
-  private isLineCrossCell(line: Line) {
-    for (let edge of this.map.edges) {
-      if (!edge.hasPoint(line.from) && !edge.hasPoint(line.to) && edge.intersect(line)) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   private drawPoint(p: Point, r: number) {

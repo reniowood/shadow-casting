@@ -13,12 +13,14 @@ interface Cell {
 export default class Map {
   private readonly map: Cell[][];
   edges: Edge[];
+  private points: Point[];
   readonly size: number;
 
   constructor(size: number) {
     this.size = size;
     this.map = this.createMap(size);
     this.edges = [];
+    this.points = [];
   }
 
   isFilled(y: number, x: number): boolean {
@@ -29,9 +31,12 @@ export default class Map {
     const Y = Math.floor(y);
     const X = Math.floor(x);
     this.map[Y][X].filled = !this.map[Y][X].filled;
+
+    this.updateEdges();
+    this.updatePoints();
   }
 
-  updateEdges() {
+  private updateEdges() {
     this.edges = [];
 
     for (let y = 0; y < this.size; y += 1) {
@@ -50,15 +55,34 @@ export default class Map {
     }
   }
 
-  get points(): Point[] {
-    const points: Point[] = [];
+  private updatePoints() {
+    this.points = [];
 
     for (const edge of this.edges) {
-      points.push(edge.from);
-      points.push(edge.to);
+      this.points.push(edge.from);
+      this.points.push(edge.to);
+    }
+  }
+
+  getCastingLines(p: Point) {
+    const castingLines: Line[] = [];
+    for (let point of this.points) {
+      const castingLine = new Line(p, point);
+      if (!this.isLineCrossCell(castingLine)) {
+        castingLines.push(castingLine);
+      }
+    }
+    return castingLines;
+  }
+
+  private isLineCrossCell(line: Line) {
+    for (let edge of this.edges) {
+      if (!edge.hasPoint(line.from) && !edge.hasPoint(line.to) && edge.intersect(line)) {
+        return true;
+      }
     }
 
-    return points;
+    return false;
   }
 
   private checkTopCell(y: number, x: number) {
