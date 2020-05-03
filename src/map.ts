@@ -1,19 +1,17 @@
-import { Line, Point } from './common';
-
-type Edge = Line;
+import { Ray, Segment, Point } from './common';
 
 interface Cell {
   filled: boolean;
-  up?: Edge;
-  down?: Edge;
-  left?: Edge;
-  right?: Edge;
+  up?: Segment;
+  down?: Segment;
+  left?: Segment;
+  right?: Segment;
 }
 
 export default class Map {
   private readonly map: Cell[][];
   readonly size: number;
-  edges: Edge[];
+  edges: Segment[];
   points: Point[];
 
   constructor(size: number) {
@@ -73,7 +71,8 @@ export default class Map {
   private getCastingPointsFrom(p: Point) {
     const castingPoints = [];
     for (const point of this.points) {
-      const intersectionPoint = this.getIntersectionPoint(p, point);
+      const ray = new Ray(p, point);
+      const intersectionPoint = ray.getNearestIntersectionPointFromOrigin(this.edges);
       if (intersectionPoint) {
         castingPoints.push(intersectionPoint);
       }
@@ -87,19 +86,6 @@ export default class Map {
     });
   }
 
-  private getIntersectionPoint(from: Point, to: Point): Point | undefined {
-    const intersectionPoints: Point[] = [];
-    const line = new Line(from, to);
-    for (const edge of this.edges) {
-      const intersectionPoint = line.getIntersectionPoint(edge);
-      if (intersectionPoint) {
-        intersectionPoints.push(intersectionPoint);
-      }
-    }
-    intersectionPoints.sort((p1, p2) => from.getDistance(p1) - from.getDistance(p2));
-    return intersectionPoints[0];
-  }
-
   private checkTopCell(y: number, x: number) {
     if (y - 1 >= 0 && !this.map[y - 1][x].filled) {
       if (x - 1 >= 0 && this.map[y][x - 1].up) {
@@ -107,7 +93,7 @@ export default class Map {
         edge.to.x += 1;
         this.map[y][x].up = edge;
       } else {
-        const edge = new Line(new Point(x, y), new Point(x + 1, y));
+        const edge = new Segment(new Point(x, y), new Point(x + 1, y));
         this.map[y][x].up = edge;
         this.edges.push(edge);
       }
@@ -121,7 +107,7 @@ export default class Map {
         edge.to.x += 1;
         this.map[y][x].down = edge;
       } else {
-        const edge: Edge = new Line(new Point(x, y + 1), new Point(x + 1, y + 1));
+        const edge = new Segment(new Point(x, y + 1), new Point(x + 1, y + 1));
         this.map[y][x].down = edge;
         this.edges.push(edge);
       }
@@ -135,7 +121,7 @@ export default class Map {
         edge.to.y += 1;
         this.map[y][x].left = edge;
       } else {
-        const edge: Edge = new Line(new Point(x, y), new Point(x, y + 1));
+        const edge = new Segment(new Point(x, y), new Point(x, y + 1));
         this.map[y][x].left = edge;
         this.edges.push(edge);
       }
@@ -149,7 +135,7 @@ export default class Map {
         edge.to.y += 1;
         this.map[y][x].right = edge;
       } else {
-        const edge: Edge = new Line(new Point(x + 1, y), new Point(x + 1, y + 1));
+        const edge = new Segment(new Point(x + 1, y), new Point(x + 1, y + 1));
         this.map[y][x].right = edge;
         this.edges.push(edge);
       }
