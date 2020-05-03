@@ -52,8 +52,18 @@ export default class Canvas {
     this.clearCanvas();
     this.drawCell();
     this.drawEdges();
-    this.drawCastingShadow();
-    this.drawCastingLines();
+    if (this.showShadowCasting()) {
+      this.drawCastingShadow();
+      this.drawCastingLines();
+    }
+  }
+
+  private showShadowCasting() {
+    if (this.cursorPosition) {
+      return !this.map.isFilled(Math.floor(this.cursorPosition.y), Math.floor(this.cursorPosition.x));
+    }
+
+    return false;
   }
 
   private clearCanvas() {
