@@ -71,13 +71,22 @@ export default class Map {
   private getCastingPointsFrom(p: Point) {
     const castingPoints = [];
     for (const point of this.points) {
-      const ray = new Ray(p, point);
-      const intersectionPoint = ray.getNearestIntersectionPointFromOrigin(this.edges);
-      if (intersectionPoint) {
-        castingPoints.push(intersectionPoint);
+      for (const ray of this.getCastingRays(p, point)) {
+        const intersectionPoint = ray.getNearestIntersectionPointFromOrigin(this.edges);
+        if (intersectionPoint) {
+          castingPoints.push(intersectionPoint);
+        }
       }
     }
     return castingPoints;
+  }
+
+  private getCastingRays(from: Point, to: Point) {
+    return [
+      new Ray(from, to),
+      new Ray(from, to.rotateAround(from, 0.01)),
+      new Ray(from, to.rotateAround(from, -0.01)),
+    ];
   }
 
   private sortCastingPointsCounterClockwiseBasedOn(p: Point, castingPoints: Point[]) {
