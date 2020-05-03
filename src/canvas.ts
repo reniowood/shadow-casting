@@ -95,16 +95,20 @@ export default class Canvas {
 
   private drawCastingShadow() {
     if (this.cursorPosition) {
-      this.drawShape(this.map.getCastingShadow(this.cursorPosition));
+      this.map.updateCastingShadows(this.cursorPosition);
+      this.drawShape(this.map.castingPoints);
+      for (const point of this.map.castingPoints) {
+        this.drawPoint(point, this.scale / 8, "green");
+      }
     }
   }
 
-  private drawPoint(p: Point, r: number) {
+  private drawPoint(p: Point, r: number, color: string = "#ff0000") {
     const context = this.element.getContext('2d');
 
     context.beginPath();
     context.arc(p.x * this.scale, p.y * this.scale, r, 0, 2 * Math.PI);
-    context.fillStyle = "#ff0000";
+    context.fillStyle = color;
     context.fill();
     context.stroke();
   }

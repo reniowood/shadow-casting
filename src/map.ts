@@ -13,6 +13,7 @@ interface Cell {
 export default class Map {
   private readonly map: Cell[][];
   edges: Edge[];
+  castingPoints: Point[];
   private points: Point[];
   readonly size: number;
 
@@ -21,6 +22,7 @@ export default class Map {
     this.map = this.createMap(size);
     this.edges = [];
     this.points = [];
+    this.castingPoints = [];
   }
 
   isFilled(y: number, x: number): boolean {
@@ -64,38 +66,42 @@ export default class Map {
     }
   }
 
-  getCastingShadow(p: Point): Point[] {
-    const castingPoints = [];
+  updateCastingShadows(p: Point) {
+    this.castingPoints = [];
     for (let point of this.points) {
-      if (!this.isLineCrossCell(new Line(p, point))) {
-        castingPoints.push(point);
+      const intersectionPoint = this.getIntersectionPoint(p, point);
+      if (intersectionPoint) {
+        this.castingPoints.push(intersectionPoint);
       }
     }
-    castingPoints.sort((p1, p2) => {
+    this.castingPoints.sort((p1, p2) => {
       return p.getDegreeBetween(p1) - p.getDegreeBetween(p2);
     });
-    return castingPoints;
   }
 
   getCastingLines(p: Point) {
     const castingLines: Line[] = [];
     for (let point of this.points) {
-      const castingLine = new Line(p, point);
-      if (!this.isLineCrossCell(castingLine)) {
+      const intersectionPoint = this.getIntersectionPoint(p, point);
+      if (intersectionPoint) {
+        const castingLine = new Line(p, intersectionPoint);
         castingLines.push(castingLine);
       }
     }
     return castingLines;
   }
 
-  private isLineCrossCell(line: Line) {
+  private getIntersectionPoint(from: Point, to: Point): Point | undefined {
+    const intersectionPoints: Point[] = [];
+    const line = new Line(from, to);
     for (let edge of this.edges) {
-      if (!edge.hasPoint(line.from) && !edge.hasPoint(line.to) && edge.intersect(line)) {
-        return true;
+      const intersectionPoint = line.getIntersectionPoint(edge);
+      if (intersectionPoint) {
+        intersectionPoints.push(intersectionPoint);
       }
     }
-
-    return false;
+    intersectionPoints.sort((p1, p2) => from.getDistance(p1) - from.getDistance(p2));
+    return intersectionPoints[0];
   }
 
   private checkTopCell(y: number, x: number) {

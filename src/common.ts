@@ -43,7 +43,7 @@ export class Line {
     return this.from.x === this.to.x;
   }
 
-  intersect(line: Line): boolean {
+  private intersect(line: Line): boolean {
     if (this.isVertical && line.isVertical) {
       return this.minX === line.minX && line.maxY >= this.minY && this.maxY >= line.minY;
     } else if (this.isVertical) {
@@ -65,6 +65,39 @@ export class Line {
 
       return this.minX <= x && x <= this.maxX &&
         line.minX <= x && x <= line.maxX;
+    }
+  }
+
+  getIntersectionPoint(line: Line): Point | undefined {
+    if (!this.intersect(line)) {
+      return undefined;
+    }
+
+    if (this.isVertical && line.isVertical) {
+      const x = this.minX;
+      const y = Math.min(this.maxY, line.maxY);
+
+      return new Point(x, y);
+    } else if (this.isVertical) {
+      const x = this.from.x;
+      const y = line.slope * x + line.yIntercept;
+
+      return new Point(x, y);
+    } else if (line.isVertical) {
+      const x = line.from.x;
+      const y = this.slope * x + this.yIntercept;
+
+      return new Point(x, y);
+    } else if (this.slope === line.slope) {
+      const x = Math.min(this.maxX, line.maxX);
+      const y = this.slope * x + this.yIntercept;
+
+      return new Point(x, y);
+    } else {
+      const x = -(this.yIntercept - line.yIntercept) / (this.slope - line.slope);
+      const y = this.slope * x + this.yIntercept;
+
+      return new Point(x, y);
     }
   }
 }
