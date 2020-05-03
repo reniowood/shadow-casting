@@ -53,6 +53,7 @@ export default class Canvas {
     this.drawCell();
     this.drawEdges();
     this.drawCastingShadow();
+    this.drawCastingLines();
   }
 
   private clearCanvas() {
@@ -87,23 +88,31 @@ export default class Canvas {
 
   private drawCastingLines() {
     if (this.cursorPosition) {
-      for (let castingLine of this.map.getCastingLines(this.cursorPosition)) {
-        this.drawLine(castingLine);
+      for (const point of this.map.points) {
+        this.drawCastingLine(this.cursorPosition, point);
       }
     }
+  }
+
+  private drawCastingLine(from: Point, to: Point) {
+    this.drawLine(new Line(from, to), "yellow");
   }
 
   private drawCastingShadow() {
     if (this.cursorPosition) {
-      this.map.updateCastingShadows(this.cursorPosition);
-      this.drawShape(this.map.castingPoints);
-      for (const point of this.map.castingPoints) {
-        this.drawPoint(point, this.scale / 8, "green");
+      const castingPoints = this.map.getCastingPoints(this.cursorPosition);
+      this.drawShape(castingPoints);
+      for (const point of castingPoints) {
+        this.drawIntersectionPoint(point);
       }
     }
   }
 
-  private drawPoint(p: Point, r: number, color: string = "#ff0000") {
+  private drawIntersectionPoint(point: Point) {
+    this.drawPoint(point, this.scale / 8, "green");
+  }
+
+  private drawPoint(p: Point, r: number, color: string = "red") {
     const context = this.element.getContext('2d');
 
     context.beginPath();
@@ -113,12 +122,13 @@ export default class Canvas {
     context.stroke();
   }
 
-  private drawLine(line: Line) {
+  private drawLine(line: Line, color: string = "white") {
     const context = this.element.getContext('2d');
 
     context.beginPath();
     context.moveTo(line.from.x * this.scale, line.from.y * this.scale);
     context.lineTo(line.to.x * this.scale, line.to.y * this.scale);
+    context.strokeStyle = color;
     context.stroke();
   }
 

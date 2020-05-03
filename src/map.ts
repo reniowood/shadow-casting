@@ -12,17 +12,15 @@ interface Cell {
 
 export default class Map {
   private readonly map: Cell[][];
-  edges: Edge[];
-  castingPoints: Point[];
-  private points: Point[];
   readonly size: number;
+  edges: Edge[];
+  points: Point[];
 
   constructor(size: number) {
     this.size = size;
     this.map = this.createMap(size);
     this.edges = [];
     this.points = [];
-    this.castingPoints = [];
   }
 
   isFilled(y: number, x: number): boolean {
@@ -66,35 +64,33 @@ export default class Map {
     }
   }
 
-  updateCastingShadows(p: Point) {
-    this.castingPoints = [];
-    for (let point of this.points) {
-      const intersectionPoint = this.getIntersectionPoint(p, point);
-      if (intersectionPoint) {
-        this.castingPoints.push(intersectionPoint);
-      }
-    }
-    this.castingPoints.sort((p1, p2) => {
-      return p.getDegreeBetween(p1) - p.getDegreeBetween(p2);
-    });
+  getCastingPoints(p: Point) {
+    const castingPoints = this.getCastingPointsFrom(p);
+    this.sortCastingPointsCounterClockwiseBasedOn(p, castingPoints);
+    return castingPoints;
   }
 
-  getCastingLines(p: Point) {
-    const castingLines: Line[] = [];
-    for (let point of this.points) {
+  private getCastingPointsFrom(p: Point) {
+    const castingPoints = [];
+    for (const point of this.points) {
       const intersectionPoint = this.getIntersectionPoint(p, point);
       if (intersectionPoint) {
-        const castingLine = new Line(p, intersectionPoint);
-        castingLines.push(castingLine);
+        castingPoints.push(intersectionPoint);
       }
     }
-    return castingLines;
+    return castingPoints;
+  }
+
+  private sortCastingPointsCounterClockwiseBasedOn(p: Point, castingPoints: Point[]) {
+    castingPoints.sort((p1, p2) => {
+      return p.getDegreeBetween(p1) - p.getDegreeBetween(p2);
+    });
   }
 
   private getIntersectionPoint(from: Point, to: Point): Point | undefined {
     const intersectionPoints: Point[] = [];
     const line = new Line(from, to);
-    for (let edge of this.edges) {
+    for (const edge of this.edges) {
       const intersectionPoint = line.getIntersectionPoint(edge);
       if (intersectionPoint) {
         intersectionPoints.push(intersectionPoint);
