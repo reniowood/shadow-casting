@@ -19,6 +19,9 @@ export default class Map {
     this.map = this.createMap(size);
     this.edges = [];
     this.points = [];
+
+    this.updateEdges();
+    this.updatePoints();
   }
 
   isFilled(y: number, x: number): boolean {
