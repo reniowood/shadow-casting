@@ -111,7 +111,8 @@ export default class Canvas {
   private drawCastingShadow() {
     if (this.cursorPosition) {
       const castingPoints = this.map.getCastingPoints(this.cursorPosition);
-      this.drawShape(castingPoints);
+      // this.drawShape(castingPoints);
+      this.drawGradientShadow(this.cursorPosition, castingPoints);
       for (const point of castingPoints) {
         this.drawIntersectionPoint(point);
       }
@@ -142,7 +143,19 @@ export default class Canvas {
     context.stroke();
   }
 
-  private drawShape(points: Point[]) {
+  private drawGradientShadow(center: Point, points: Point[]) {
+    const context = this.element.getContext('2d');
+
+    const gradient = context.createRadialGradient(
+      center.x * this.scale, center.y * this.scale, 1,
+      center.x * this.scale, center.y * this.scale, this.size / 4
+    );
+    gradient.addColorStop(0, "white");
+    gradient.addColorStop(1, "black");
+    this.drawShape(points, gradient);
+  }
+
+  private drawShape(points: Point[], color: string | CanvasGradient | CanvasPattern = "white") {
     const context = this.element.getContext('2d');
 
     if (points.length > 0) {
@@ -153,7 +166,7 @@ export default class Canvas {
         context.lineTo(points[i % count].x * this.scale, points[i % count].y * this.scale);
       }
       context.closePath();
-      context.fillStyle = "white";
+      context.fillStyle = color;
       context.fill();
     }
   }
