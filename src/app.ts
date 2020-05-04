@@ -14,7 +14,11 @@ export default class App {
 
   run() {
     setInterval(() => {
-      this.canvas.draw();
+      this.canvas.draw({
+        showCastingLines: true,
+        showEdges: true,
+        showIntersectionPoints: true
+      });
     }, 1000 / this.fps);
   }
 }

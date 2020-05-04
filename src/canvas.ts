@@ -48,22 +48,19 @@ export default class Canvas {
     };
   }
 
-  draw() {
+  draw(props: {
+    showEdges: boolean,
+    showCastingLines: boolean,
+    showIntersectionPoints: boolean
+  }) {
     this.clearCanvas();
+
     this.drawCell();
-    this.drawEdges();
-    if (this.showShadowCasting()) {
-      this.drawCastingShadow();
-      this.drawCastingLines();
-    }
-  }
-
-  private showShadowCasting() {
-    if (this.cursorPosition) {
-      return !this.map.isFilled(Math.floor(this.cursorPosition.y), Math.floor(this.cursorPosition.x));
+    if (props.showEdges) {
+      this.drawEdges();
     }
 
-    return false;
+    this.drawShadowCasting(props);
   }
 
   private clearCanvas() {
@@ -96,27 +93,37 @@ export default class Canvas {
     });
   }
 
-  private drawCastingLines() {
-    if (this.cursorPosition) {
-      for (const point of this.map.points) {
-        this.drawCastingLine(this.cursorPosition, point);
+  private drawShadowCasting(props: {
+    showCastingLines: boolean,
+    showIntersectionPoints: boolean
+  }) {
+    if (this.cursorPosition && this.showShadowCasting()) {
+      const castingPoints = this.map.getCastingPoints(this.cursorPosition);
+
+      this.drawGradientShadow(this.cursorPosition, castingPoints);
+      if (props.showIntersectionPoints) {
+        for (const point of castingPoints) {
+          if (props.showIntersectionPoints) {
+            this.drawIntersectionPoint(point);
+          }
+          if (props.showCastingLines) {
+            this.drawCastingLine(this.cursorPosition, point);
+          }
+        }
       }
     }
+  }
+
+  private showShadowCasting() {
+    if (this.cursorPosition) {
+      return !this.map.isFilled(Math.floor(this.cursorPosition.y), Math.floor(this.cursorPosition.x));
+    }
+
+    return false;
   }
 
   private drawCastingLine(from: Point, to: Point) {
     this.drawLine(new Line(from, to), "yellow");
-  }
-
-  private drawCastingShadow() {
-    if (this.cursorPosition) {
-      const castingPoints = this.map.getCastingPoints(this.cursorPosition);
-      // this.drawShape(castingPoints);
-      this.drawGradientShadow(this.cursorPosition, castingPoints);
-      for (const point of castingPoints) {
-        this.drawIntersectionPoint(point);
-      }
-    }
   }
 
   private drawIntersectionPoint(point: Point) {
