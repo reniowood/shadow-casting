@@ -101,14 +101,12 @@ export default class Canvas {
       const castingPoints = this.map.getCastingPoints(this.cursorPosition);
 
       this.drawGradientShadow(this.cursorPosition, castingPoints);
-      if (props.showIntersectionPoints) {
-        for (const point of castingPoints) {
-          if (props.showIntersectionPoints) {
-            this.drawIntersectionPoint(point);
-          }
-          if (props.showCastingLines) {
-            this.drawCastingLine(this.cursorPosition, point);
-          }
+      for (const point of castingPoints) {
+        if (props.showIntersectionPoints) {
+          this.drawIntersectionPoint(point);
+        }
+        if (props.showCastingLines) {
+          this.drawCastingLine(this.cursorPosition, point);
         }
       }
     }
