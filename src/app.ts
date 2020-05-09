@@ -14,9 +14,9 @@ export default class App {
     this.map = new Map(size / scale);
     this.fps = fps;
     this.options = {
-      showCastingLines: true,
-      showEdges: true,
-      showIntersectionPoints: true
+      showCastingLines: false,
+      showEdges: false,
+      showIntersectionPoints: false
     };
     this.optionsPanel = new OptionsPanel(this.options);
     this.canvas = new Canvas(size, this.map);
